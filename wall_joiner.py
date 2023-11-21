@@ -1,9 +1,10 @@
 import numpy as np
 import cv2
-import math
 import random
 
-img = cv2.imread("floorplan1_walls.jpg")
+PATH = "images/ex1/"
+
+img = cv2.imread(f"{PATH}walls.jpg")
 ends = img.copy()
 boxes = img.copy()
 intersections = img.copy()
@@ -46,11 +47,10 @@ out = cv2.add(out1, out2)
 
 # store the loose end points and draw them for visualization
 pts = np.argwhere(out == 255)
-
 for pt in pts:
     ends = cv2.circle(ends, (pt[1], pt[0]), 3, (0, 200, 200), -1)
 
-cv2.imwrite("loose_ends.jpg", ends)
+cv2.imwrite(f"{PATH}loose_ends.jpg", ends)
 
 # convert array of points to list of tuples
 pts = list(map(tuple, pts))
@@ -58,6 +58,7 @@ pts = list(map(tuple, pts))
 # final is an array of rows of pixels, length being img height
 final = sk.copy()
 
+# create box around each loose end, find intersection with wall
 for i, pt1 in enumerate(pts):
     search_dist = 10
     search_box = []
@@ -86,6 +87,7 @@ for i, pt1 in enumerate(pts):
         else:
             search_dist += 1
 
+    # draw intersection
     intersections = cv2.circle(
         boxes, (intersection[1], intersection[0]), 3, (0, 200, 200), -1
     )
@@ -93,16 +95,18 @@ for i, pt1 in enumerate(pts):
     dy = pt1[0] - intersection[0]
     dx = pt1[1] - intersection[1]
 
+    # use these in fillings to debug
     rand1 = random.randint(0, 255)
     rand2 = random.randint(0, 255)
     rand3 = random.randint(0, 255)
 
-    # somehow x and y are getting swapped throughout...
+    # TO DO: somehow x and y are getting swapped throughout... Makes logic confusing!
     print("dy", dy, dx)
     print("pt1", pt1)
     print("int", intersection)
 
-    if abs(dy) < abs(dx):  # if dy == 0
+    # extend walls horizontally or vertically until they reach another wall
+    if abs(dy) < abs(dx):  # TO DO: if dy == 0
         extension = 1
         direction = -1 if dy > 0 else 1
         while True:
@@ -114,14 +118,13 @@ for i, pt1 in enumerate(pts):
                     fillings,
                     (pt1[1], pt1[0]),
                     (new_x, pt1[0]),
-                    (rand1, rand2, rand3),
+                    (0, 0, 0),
                     thickness=3,
                 )
                 break
 
             extension += 1
-
-    else:  # if dx == 0
+    else:  # TO DO: if dx == 0
         extension = 1
         direction = 1 if dy > 0 else -1
         while True:
@@ -133,12 +136,11 @@ for i, pt1 in enumerate(pts):
                     fillings,
                     (pt1[1], pt1[0]),
                     (pt1[1], new_y),
-                    (rand1, rand2, rand3),
+                    (0, 0, 0),
                     thickness=3,
                 )
                 break
             extension += 1
 
-cv2.imwrite("floorplan1_rooms.jpg", fillings)
-cv2.imwrite("boxes.jpg", boxes)
-cv2.imwrite("intersections.jpg", intersections)
+cv2.imwrite(f"{PATH}boxes.jpg", boxes)
+cv2.imwrite(f"{PATH}rooms.jpg", fillings)

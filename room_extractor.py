@@ -1,3 +1,13 @@
+"""
+This script extracts rooms a floorplan based on a "rooms" image of its enclosed 
+rooms (see wall_joiner.py). Provide a PATH to store images and prevent files 
+being overwritten.
+
+The image is first cropped manually to remove the outer borders. The implementation
+of this is clumsy and homemade - need to find a proper algorithm at some point! 
+
+See https://stackoverflow.com/questions/57777368/how-to-detect-and-extract-rectangles-with-python-opencv
+"""
 import cv2
 from pathlib import Path
 
@@ -65,15 +75,13 @@ for row in range(len(img)):
 
 cropped = cv2.threshold(cropped, 120, 255, cv2.THRESH_BINARY)[1]
 
-cv2.imwrite(f"{PATH}cropped.jpg", cropped)
+cv2.imwrite(f"{PATH}6_cropped.jpg", cropped)
 
 # load original for chopping up into rooms
-# before continuing, remove the walls from the original? so we just see objects
 original = cv2.imread(f"{PATH}original.jpg", cv2.IMREAD_GRAYSCALE)
 img = cropped.copy()
 
 # find contours
-# https://stackoverflow.com/questions/57777368/how-to-detect-and-extract-rectangles-with-python-opencv
 cnts = cv2.findContours(cropped, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 cnts = cnts[0] if len(cnts) == 2 else cnts[1]
 
@@ -89,4 +97,4 @@ for c in cnts:
     cv2.imwrite(f"{PATH}rooms/ROI_{image_number}.png", ROI)
     image_number += 1
 
-cv2.imwrite(f"{PATH}final.jpg", cropped)
+cv2.imwrite(f"{PATH}7_final.jpg", cropped)

@@ -1,3 +1,17 @@
+"""
+This script creates enclosed rooms from a given wall image (see wall_finder.py).
+Provide a PATH to store images and prevent files being overwritten.
+
+A few failed attempts were made and now exist in the "/old" directory.
+The current approach is to consider a room as defined by the imagined continuation 
+of its walls. 'Loose ends' are found and then continued in their current direction 
+until they meet another wall. For the time being this direction is limited to 
+vertical and horizontal.
+
+See https://stackoverflow.com/questions/26586123/filling-gaps-in-shape-edges
+"""
+
+
 import numpy as np
 import cv2
 import random
@@ -50,7 +64,7 @@ pts = np.argwhere(out == 255)
 for pt in pts:
     ends = cv2.circle(ends, (pt[1], pt[0]), 3, (0, 200, 200), -1)
 
-cv2.imwrite(f"{PATH}loose_ends.jpg", ends)
+cv2.imwrite(f"{PATH}3_loose_ends.jpg", ends)
 
 # convert array of points to list of tuples
 pts = list(map(tuple, pts))
@@ -142,5 +156,5 @@ for i, pt1 in enumerate(pts):
                 break
             extension += 1
 
-cv2.imwrite(f"{PATH}boxes.jpg", boxes)
-cv2.imwrite(f"{PATH}rooms.jpg", fillings)
+cv2.imwrite(f"{PATH}4_boxes.jpg", boxes)
+cv2.imwrite(f"{PATH}5_rooms.jpg", fillings)

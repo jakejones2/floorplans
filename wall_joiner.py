@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import random
 
-PATH = "images/ex1/"
+PATH = "images/ex3/"
 
 img = cv2.imread(f"{PATH}walls.jpg")
 ends = img.copy()

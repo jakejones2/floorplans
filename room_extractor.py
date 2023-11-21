@@ -1,7 +1,7 @@
-import numpy as np
 import cv2
+from pathlib import Path
 
-PATH = "images/ex1/"
+PATH = "images/ex3/"
 
 img = cv2.imread(f"{PATH}rooms.jpg", cv2.IMREAD_GRAYSCALE)
 horizontal_crop = img.copy()
@@ -67,14 +67,18 @@ cropped = cv2.threshold(cropped, 120, 255, cv2.THRESH_BINARY)[1]
 
 cv2.imwrite(f"{PATH}cropped.jpg", cropped)
 
+# load original for chopping up into rooms
+# before continuing, remove the walls from the original? so we just see objects
+original = cv2.imread(f"{PATH}original.jpg", cv2.IMREAD_GRAYSCALE)
 img = cropped.copy()
-original = cv2.imread(f"{PATH}original.png", cv2.IMREAD_GRAYSCALE)
 
-# before continuing, try to remove the walls from the original? so we just see objects
-
+# find contours
+# https://stackoverflow.com/questions/57777368/how-to-detect-and-extract-rectangles-with-python-opencv
 cnts = cv2.findContours(cropped, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 cnts = cnts[0] if len(cnts) == 2 else cnts[1]
 
+# create regions of interest (rooms)
+Path(f"{PATH}rooms").mkdir(parents=True, exist_ok=True)
 image_number = 0
 for c in cnts:
     x, y, w, h = cv2.boundingRect(c)
@@ -86,8 +90,3 @@ for c in cnts:
     image_number += 1
 
 cv2.imwrite(f"{PATH}final.jpg", cropped)
-
-# for row in range(len(img)):
-#     for pix in range(len(img[0])):
-#         if pix:
-#
